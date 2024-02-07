@@ -4,11 +4,13 @@ public abstract class BaseBrsHandler<TCommand>
 {
     public async Task HandleAsync(TCommand command)
     {
+        var brs = RecognizeBrs(command);
         var id = RecognizeId(command);
-        await ProduceAysnc("brs-");
+        // add header with key brs-id=@id
+        await ProduceAsync("topic.sth." + brs, command);
     }
 
-    private async Task ProduceAysnc(string brs)
+    private async Task ProduceAsync(string brs, TCommand command)
     {
         throw new NotImplementedException();
     }

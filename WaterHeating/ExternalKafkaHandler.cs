@@ -3,7 +3,7 @@ using KMD.Elements.Libraries.KafkaClient.Handlers;
 
 namespace WaterHeating;
 
-internal abstract class BaseKafkaHandler<TMessage, TCommand>: IKafkaMessageHandler<string, TMessage>
+internal abstract class ExternalKafkaHandler<TMessage, TCommand>: IKafkaMessageHandler<string, TMessage>
 {
     public Task Handle(ConsumeResult<string, TMessage> consumeResult, CancellationToken cancellationToken)
     {

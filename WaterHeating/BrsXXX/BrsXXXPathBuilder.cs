@@ -2,7 +2,7 @@
 
 public sealed class BrsXXXPathBuilder : BaseBrsPathBuilder
 {
-    public void Apply(UpsertMeteringPointCustomerVersionEvent @event)
+    public void Apply(UpsertMeteringPointEvent @event)
     {
         BrsDetails.Abc = "";
     }
