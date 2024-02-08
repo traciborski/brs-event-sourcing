@@ -1,42 +1,48 @@
 ﻿using Confluent.Kafka;
-using KMD.Elements.Libraries.KafkaClient.Consumer;
 using KMD.Elements.Libraries.KafkaClient.Handlers;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
-using Polly;
+using KMD.Elements.Libraries.KafkaClient.Helpers;
 
 namespace WaterHeating;
 
-public abstract class InternalKafkaHandler: IKafkaMessageHandler<string, BrsCommand>
+public abstract class InternalKafkaHandler : IKafkaMessageHandler<string, BrsCommand>
 {
-    public  abstract string Topic {get;}
-
-    public InternalKafkaHandler()
-    {
-        //_logger = logger;
-
-        var _consumer = new KafkaConsumerBuilder<string, BrsCommand>(new ConsumerConfig {  })
-            .SetValueDeserializer(new Deserializer()) // BrsXXXDeserializer
-            .SetTopic(Topic)
-            .SetDisableAutoStoreOffset()
-            .SetEnableDefaultConsumerHandlers()
-            //.SetAutoOffsetReset(AutoOffsetReset.Earliest)
-            .SetExecutionPolicy(Policy.Handle<Exception>().RetryAsync(3))
-            //.SetLogger(logger)
-            //.SetServiceProvider(serviceProvider)
-            .Build();
-    }
+    protected abstract BaseBrs Brs { get; }
 
     public async Task Handle(ConsumeResult<string, BrsCommand> consumeResult, CancellationToken cancellationToken)
     {
-        await Handle(consumeResult.Value);
+        var brsId = consumeResult.Message.Headers.GetCorrelationId().ToString(); // not GetCorrelationId but GetBrsId instead
+        Brs.BrsId = brsId; // todo: 
+
+        var oldEvents = await FetchEventsAsync(brsId);
+        Brs.Apply(oldEvents);
+
+        var command = consumeResult.Value;
+        var events = Brs.Handle(command);
+
+        await PersistAsync(events);
     }
 
-    protected abstract Task Handle(BrsCommand command);
+    private async Task<IEnumerable<BrsEvent>> FetchEventsAsync(string brsId)
+    {
+        throw new NotImplementedException();
+    }
 
-    //protected virtual Task Handle(BrsCommand command)
-    //{
-    //    throw new NotSupportedException();
-    //    // return Task.CompletedTask;
-    //}
+    private async Task PersistAsync(IEnumerable<BrsEvent> events)
+    {
+        var brsId = Brs.BrsId;
+        var brsName = Brs.GetType().Name;
+        var createdAt = DateTime.UtcNow;
+        var eventType = "";
+        var payload = "serialize every event";
+        var version = 123;
+
+        /* brs-events
+            GUID Brs-4 CreateEvent 1 { json } 
+            GUID Brs-4 RejectEvent 2 { json }
+            GUID Brs-4 SthEvent 3 { json }
+        */
+
+        // persist BrsEvent = BrsId, Version (1,2,3), CreatedAt, Brs, Payload (serialized BrsEvent)
+        throw new NotImplementedException();
+    }
 }

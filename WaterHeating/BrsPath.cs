@@ -7,4 +7,5 @@ public class BrsPath
     public string[] Milestones { get; set; }
 
     public string? Etc { get; set; }
+    public string ProcessCenterStatus { get; set; }
 };

@@ -1,3 +1,3 @@
 ﻿namespace WaterHeating;
 
-public abstract record BrsEvent();
+public abstract record BrsEvent(); // interaface ?

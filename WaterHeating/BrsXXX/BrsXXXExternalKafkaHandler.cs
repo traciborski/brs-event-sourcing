@@ -7,4 +7,14 @@ internal class BrsXXXExternalKafkaHandler
     {
         throw new NotImplementedException();
     }
+
+    protected override string RecognizeBrsId(UpsertMeteringPointCommand command)
+    {
+        return Guid.NewGuid().ToString();
+    }
+
+    protected override string RecognizeTopic(UpsertMeteringPointCommand command)
+    {
+        return "topic.team9.commands.brs-xxx";
+    }
 }
